@@ -1,0 +1,88 @@
+{
+  "founders": [
+    {
+      "id": "demo",
+      "email": "alex@nexastack.io",
+      "name": "Alex Chen",
+      "company": "NexaStack",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    }
+  ],
+  "teamMembers": [
+    {
+      "id": "tm-1",
+      "name": "Priya Sharma",
+      "role": "Lead Backend Dev",
+      "walletAddress": "7xKXtg2CW87d97TXJSDpbD5jBkheTqA83TZRuJosgAsU",
+      "allocationPercent": 25,
+      "founderId": "demo",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "tm-3",
+      "name": "Yuki Tanaka",
+      "role": "ML Engineer",
+      "walletAddress": "BvPFZ4vBBMnXVMqZ1Rq1tHt8Qvwt9ZGbCmBrJDJDshf",
+      "allocationPercent": 25,
+      "founderId": "demo",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "tm-4",
+      "name": "Amara Diallo",
+      "role": "DevOps Engineer",
+      "walletAddress": "DGmD3w2zJ9c8Bt2YRc7qwp3X6GBjuFZQeKZg1YEVHV5",
+      "allocationPercent": 20,
+      "founderId": "demo",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "id": "tm-5",
+      "name": "Leo Müller",
+      "role": "Product Designer",
+      "walletAddress": "Ej4WCjp3vPYq4ZqkV8s7zT8cDRGnVxXeSmWBERjpZjAf",
+      "allocationPercent": 10,
+      "founderId": "demo",
+      "createdAt": "2025-01-01T00:00:00.000Z"
+    },
+    {
+      "founderId": "demo",
+      "name": "alice",
+      "role": "senior",
+      "walletAddress": "5KLGJSASDVxKPjLCDWNtnABLpZjsQSrYZ8HKwcEdAMC8",
+      "allocationPercent": 20,
+      "id": "26bae77d-0167-4806-998b-c6cede676502",
+      "createdAt": "2026-05-05T22:12:14.319Z"
+    },
+    {
+      "founderId": "demo",
+      "name": "alice",
+      "role": "senior",
+      "walletAddress": "5KLGJSASDVxKPjLCDWNtnABLpZjsQSrYZ8HKwcEdAMC8",
+      "allocationPercent": 20,
+      "id": "b91e41b8-4a89-46d6-aa6a-f81fc46893f1",
+      "createdAt": "2026-05-05T22:16:16.130Z"
+    }
+  ],
+  "payments": [
+    {
+      "founderId": "demo",
+      "amountUSD": 1000,
+      "status": "pending",
+      "id": "da71e9e0-3adb-4029-b679-e3021cc827b1",
+      "createdAt": "2026-05-05T21:33:06.313Z",
+      "dodoPaymentId": "dodo_demo_1778016786314",
+      "dodoCheckoutUrl": "http://localhost:3000/success?payment_id=da71e9e0-3adb-4029-b679-e3021cc827b1?payment_id=da71e9e0-3adb-4029-b679-e3021cc827b1&dodo_id=dodo_demo_1778016786314&demo=true"
+    },
+    {
+      "founderId": "demo",
+      "amountUSD": 1000,
+      "status": "pending",
+      "id": "60f07e29-e40e-48ee-ac72-3adc4a5887ba",
+      "createdAt": "2026-05-05T22:17:45.154Z",
+      "dodoPaymentId": "dodo_demo_1778019465154",
+      "dodoCheckoutUrl": "http://localhost:3000/success?payment_id=60f07e29-e40e-48ee-ac72-3adc4a5887ba?payment_id=60f07e29-e40e-48ee-ac72-3adc4a5887ba&dodo_id=dodo_demo_1778019465154&demo=true"
+    }
+  ],
+  "disbursements": []
+}

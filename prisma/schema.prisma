@@ -1,0 +1,52 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Founder {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  company   String
+  createdAt DateTime @default(now())
+  team      TeamMember[]
+  payments  Payment[]
+}
+
+model TeamMember {
+  id            String   @id @default(cuid())
+  name          String
+  role          String
+  walletAddress String
+  allocation    Float    // percentage or fixed amount
+  founderId     String
+  founder       Founder  @relation(fields: [founderId], references: [id])
+  createdAt     DateTime @default(now())
+  disbursements Disbursement[]
+}
+
+model Payment {
+  id              String   @id @default(cuid())
+  founderId       String
+  founder         Founder  @relation(fields: [founderId], references: [id])
+  amountUSD       Float
+  dodoPaymentId   String?
+  status          String   @default("pending") // pending, completed, failed
+  createdAt       DateTime @default(now())
+  disbursements   Disbursement[]
+}
+
+model Disbursement {
+  id            String   @id @default(cuid())
+  paymentId     String
+  payment       Payment  @relation(fields: [paymentId], references: [id])
+  teamMemberId  String
+  teamMember    TeamMember @relation(fields: [teamMemberId], references: [id])
+  amountUSDC    Float
+  txSignature   String?
+  status        String   @default("pending")
+  createdAt     DateTime @default(now())
+}

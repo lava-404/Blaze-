@@ -1,0 +1,81 @@
+import { NextRequest, NextResponse } from 'next/server';
+import { db } from '@/lib/db';
+import { simulateDistribution, DistributionRecipient } from '@/lib/solana';
+import { calculateNetAmount } from '@/lib/dodo';
+
+export async function POST(req: NextRequest) {
+  const { paymentId, dodoPaymentId } = await req.json();
+
+  if (!paymentId) {
+    return NextResponse.json({ error: 'Payment ID required' }, { status: 400 });
+  }
+
+  const payment = db.getPayment(paymentId);
+  if (!payment) {
+    return NextResponse.json({ error: 'Payment not found' }, { status: 404 });
+  }
+
+  // Mark as processing
+  db.updatePayment(paymentId, { status: 'processing', dodoPaymentId });
+
+  // Get team members for this founder
+  const teamMembers = db.getTeamMembersByFounder(payment.founderId);
+  
+  if (teamMembers.length === 0) {
+    db.updatePayment(paymentId, { status: 'failed' });
+    return NextResponse.json({ error: 'No team members configured' }, { status: 400 });
+  }
+
+  // Calculate net amount after Blaze fee
+  const { net: netUSDC } = calculateNetAmount(payment.amountUSD);
+  const totalAlloc = teamMembers.reduce((s, m) => s + m.allocationPercent, 0);
+
+  // Build recipients
+  const recipients: DistributionRecipient[] = teamMembers.map(m => ({
+    teamMemberId: m.id,
+    walletAddress: m.walletAddress,
+    amountUSDC: (netUSDC * m.allocationPercent) / Math.max(totalAlloc, 100),
+  }));
+
+  // Create pending disbursements
+  const disbursementRecords = recipients.map(r =>
+    db.createDisbursement({
+      paymentId,
+      teamMemberId: r.teamMemberId,
+      amountUSDC: r.amountUSDC,
+      status: 'pending',
+    })
+  );
+
+  // Execute distribution (simulated for demo, real Solana call in production)
+  const USE_SIMULATION = !process.env.PLATFORM_WALLET_PRIVATE_KEY || 
+    process.env.PLATFORM_WALLET_PRIVATE_KEY === 'your_base58_encoded_private_key';
+
+  const results = await simulateDistribution(recipients);
+
+  // Update disbursement records
+  const enrichedResults = results.map((result, i) => {
+    const dbRecord = disbursementRecords[i];
+    db.updateDisbursement(dbRecord.id, {
+      txSignature: result.txSignature,
+      status: result.status,
+    });
+    const member = teamMembers.find(m => m.id === result.teamMemberId);
+    return {
+      ...result,
+      memberName: member?.name || 'Unknown',
+    };
+  });
+
+  const allCompleted = results.every(r => r.status === 'completed');
+  db.updatePayment(paymentId, { status: allCompleted ? 'completed' : 'failed' });
+
+  const txSignature = results[0]?.txSignature || '';
+
+  return NextResponse.json({
+    success: allCompleted,
+    disbursements: enrichedResults,
+    txSignature,
+    isSimulated: USE_SIMULATION,
+  });
+}
