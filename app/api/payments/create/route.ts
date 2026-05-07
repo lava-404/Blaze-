@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { db } from '@/lib/db';
+import { prisma } from "@/lib/prisma";
 import { createDodoCheckout } from '@/lib/dodo';
 
 export async function POST(req: NextRequest) {
@@ -10,10 +10,12 @@ export async function POST(req: NextRequest) {
   }
 
   // Create pending payment record
-  const payment = db.createPayment({
-    founderId,
-    amountUSD,
-    status: 'pending',
+  const payment = await prisma.payment.create({
+    data: {
+      founderId,
+      amountUSD,
+      status: 'pending',
+    },
   });
 
   const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
@@ -32,9 +34,11 @@ export async function POST(req: NextRequest) {
   });
 
   // Update payment with Dodo session ID
-  db.updatePayment(payment.id, {
-    dodoPaymentId: session.id,
-    dodoCheckoutUrl: session.url,
+  await prisma.payment.update({
+    where: { id: payment.id },
+    data: {
+      dodoPaymentId: session.id,
+    },
   });
 
   return NextResponse.json({

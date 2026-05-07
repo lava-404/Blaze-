@@ -1,16 +1,16 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
+import { usePrivy } from '@privy-io/react-auth';
 import {
   Users, DollarSign, Zap, ArrowRight, Plus, Clock,
   CheckCircle, AlertCircle, ExternalLink, Flame, BarChart3,
   Wallet, CreditCard, ChevronRight,
 } from 'lucide-react';
 
-interface TeamMember { id: string; name: string; role: string; walletAddress: string; allocationPercent: number; }
+interface TeamMember { id: string; name: string; role: string; walletAddress: string; allocationAmountUSD: number; }
 interface Payment    { id: string; amountUSD: number; status: string; createdAt: string; }
-
-const DEMO_FOUNDER = { name: 'Alex Chen', company: 'NexaStack', email: 'alex@nexastack.io' };
 
 const STATUS_ICON: Record<string, React.ReactNode> = {
   completed:  <CheckCircle size={13} style={{ color: '#00D278' }} />,
@@ -34,7 +34,47 @@ const AVATAR_GRADIENTS = [
   'linear-gradient(135deg,#CC3D00,#FF6B1A)',
 ];
 
+function getPrivyEmail(user: any): string | null {
+  if (!user?.linkedAccounts) return null;
+  
+  const account = user.linkedAccounts.find(
+    (acc: any) =>
+      acc.type === 'email' ||
+      acc.type === 'google_oauth' ||
+      acc.type === 'twitter_oauth' ||
+      acc.type === 'discord_oauth'
+  );
+
+  const email =
+    account?.address ??
+    account?.email ??
+    null;
+
+  return typeof email === 'string' && email.includes('@')
+    ? email
+    : null;
+}
+
+function getPrivyDisplayName(user: any): string {
+  const name =
+    user?.name ??
+    user?.google?.name ??
+    user?.twitter?.name ??
+    user?.discord?.name ??
+    null;
+  if (typeof name === 'string' && name.trim()) return name.trim();
+
+  const email = getPrivyEmail(user);
+  if (email) return email.split('@')[0] || 'User';
+  return 'User';
+}
+
 export default function Dashboard() {
+  const router = useRouter();
+  const { authenticated, user } = usePrivy();
+  const founderEmail = getPrivyEmail(user);
+  const founderName = getPrivyDisplayName(user);
+
   const [team,     setTeam]     = useState<TeamMember[]>([]);
   const [payments, setPayments] = useState<Payment[]>([]);
   const [loading,  setLoading]  = useState(true);
@@ -42,26 +82,42 @@ export default function Dashboard() {
   const [paying,   setPaying]   = useState(false);
 
   useEffect(() => {
+    if (!authenticated) {
+      router.replace('/');
+      return;
+    }
+    if (!founderEmail) return;
+
+    setLoading(true);
     Promise.all([
-      fetch('/api/team?founderId=demo').then(r => r.json()),
-      fetch('/api/payments?founderId=demo').then(r => r.json()),
+      fetch(`/api/team?founderEmail=${encodeURIComponent(founderEmail)}`).then(r => r.json()),
+      fetch(`/api/payments?founderEmail=${encodeURIComponent(founderEmail)}`).then(r => r.json()),
     ]).then(([t, p]) => {
       setTeam(t.members || []);
       setPayments(p.payments || []);
       setLoading(false);
     }).catch(() => setLoading(false));
-  }, []);
+  }, [authenticated, founderEmail, router]);
 
   async function handlePay() {
     if (!payAmount || parseFloat(payAmount) <= 0) return;
+    if (!founderEmail) return;
     setPaying(true);
     try {
       const res = await fetch('/api/payments/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ founderId: 'demo', amountUSD: parseFloat(payAmount) }),
+        body: JSON.stringify({ founderEmail, founderName, amountUSD: parseFloat(payAmount) }),
       });
       const data = await res.json();
+      if (!res.ok) {
+        if (data?.code === 'TEAM_REQUIRED') {
+          router.push('/onboarding?reason=team_required');
+          return;
+        }
+        alert(data?.error || 'Error creating payment');
+        return;
+      }
       if (data.checkoutUrl) window.location.href = data.checkoutUrl;
     } catch { alert('Error creating payment'); }
     finally { setPaying(false); }
@@ -69,7 +125,7 @@ export default function Dashboard() {
 
   const totalPaid = payments.filter(p => p.status === 'completed').reduce((s, p) => s + p.amountUSD, 0);
   const netAmount = parseFloat(payAmount) * 0.975;
-  const totalAlloc = team.reduce((s, m) => s + m.allocationPercent, 0);
+  const totalAlloc = team.reduce((s, m) => s + m.allocationAmountUSD, 0);
 
   return (
     <div className="min-h-screen" style={{ background: '#0a0a0a' }}>
@@ -83,12 +139,12 @@ export default function Dashboard() {
         </Link>
         <div className="flex items-center gap-3">
           <div className="hidden md:block text-right">
-            <div className="text-sm font-medium" style={{ color: '#FAFAFA' }}>{DEMO_FOUNDER.name}</div>
-            <div className="text-xs" style={{ color: '#A0A0A0' }}>{DEMO_FOUNDER.company}</div>
+            <div className="text-sm font-medium" style={{ color: '#FAFAFA' }}>{founderName}</div>
+            {founderEmail && <div className="text-xs" style={{ color: '#A0A0A0' }}>{founderEmail}</div>}
           </div>
           <div className="w-9 h-9 rounded-full flex items-center justify-center font-bold text-sm text-white"
             style={{ background: 'linear-gradient(135deg,#FF4D00,#FF8C42)' }}>
-            {DEMO_FOUNDER.name[0]}
+            {founderName[0]}
           </div>
         </div>
       </header>
@@ -196,8 +252,84 @@ export default function Dashboard() {
                   onMouseLeave={e=>(e.currentTarget.style.color='#A0A0A0')}>
                   <Plus size={12} /> Add member
                 </Link>
+                
+              </div>
+              {loading ? (
+    <div
+      className="text-sm py-8 text-center"
+      style={{ color: '#555' }}
+    >
+      Loading team...
+    </div>
+  ) : team.length === 0 ? (
+    <div
+      className="text-sm py-8 text-center"
+      style={{ color: '#555' }}
+    >
+      No team members yet
+    </div>
+  ) : (
+    <div className="space-y-3">
+      {team.map((member, index) => (
+        <div
+          key={member.id}
+          className="p-4 rounded-xl flex items-start justify-between"
+          style={{
+            background: '#111',
+            border: '1px solid #1f1f1f',
+          }}
+        >
+          <div className="flex gap-3">
+            <div
+              className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold text-white"
+              style={{
+                background:
+                  AVATAR_GRADIENTS[
+                    index % AVATAR_GRADIENTS.length
+                  ],
+              }}
+            >
+              {member.name.charAt(0).toUpperCase()}
+            </div>
+
+            <div>
+              <div
+                className="text-sm font-medium"
+                style={{ color: '#FAFAFA' }}
+              >
+                {member.name}
+              </div>
+
+              <div
+                className="text-xs"
+                style={{ color: '#888' }}
+              >
+                {member.role}
+              </div>
+
+              <div
+                className="text-xs mt-1"
+                style={{
+                  color: '#555',
+                  fontFamily: "'DM Mono', monospace",
+                }}
+              >
+                {shortenAddr(member.walletAddress)}
               </div>
             </div>
+          </div>
+
+          <div
+            className="text-sm font-mono-custom"
+            style={{ color: '#FFB400' }}
+          >
+            ${member.allocationAmountUSD.toFixed(2)}
+          </div>
+        </div>
+      ))}
+    </div>
+  )}
+              </div>
 
             {/* Payment history */}
             <div className="card p-6">

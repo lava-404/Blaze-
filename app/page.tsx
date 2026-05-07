@@ -74,7 +74,7 @@ export default function LandingPage() {
   }, [authenticated, login, router]);
 
   return (
-    <main className="min-h-screen" style={{ background: '#0a0a0a' }}>
+    <main className="min-h-screen section-shell" style={{ background: '#0a0a0a' }}>
 
       {/* ── Navbar ───────────────────────────────────────── */}
       <nav
@@ -83,7 +83,7 @@ export default function LandingPage() {
       >
         <Link href="/" className="flex items-center gap-2">
           <Flame size={22} style={{ color: '#FF4D00' }} />
-          <span className="font-display text-3xl tracking-wider" style={{ color: '#FAFAFA' }}>BLAZE</span>
+          <span className="font-display text-3xl tracking-tight italic" style={{ color: '#FAFAFA' }}>blaze</span>
         </Link>
 
         <div className="hidden md:flex items-center gap-8">
@@ -97,7 +97,7 @@ export default function LandingPage() {
         </div>
 
         {/* "Launch App" — auth-gated */}
-        <button onClick={handleLaunchApp} className="btn-blaze px-5 py-2.5 rounded-lg text-sm gap-2">
+        <button onClick={handleLaunchApp} className="btn-blaze px-3 py-2 rounded-lg font-light text-sm gap-2">
           Launch App <ArrowRight size={14} />
         </button>
       </nav>
@@ -116,15 +116,13 @@ export default function LandingPage() {
         </div>
 
         <h1
-          className={`relative font-display leading-none tracking-wider mb-6 transition-all duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}
-          style={{ fontSize: 'clamp(56px, 10vw, 128px)' }}
+          className={`relative font-display leading-none mb-6 text-5xl md:text-7xl transition-all duration-700 ${mounted ? 'opacity-100' : 'opacity-0'}`}
         >
-          <span style={{ color: '#FAFAFA' }}>PAY YOUR</span><br />
-          <span className="text-gradient">GLOBAL TEAM</span><br />
-          <span style={{ color: '#FAFAFA' }}>IN SECONDS</span>
+          <span style={{ color: '#FAFAFA' }}>pay your </ span>
+          <span className="text-gradient italic">global </span>
+          <span style={{ color: '#FAFAFA' }}>team</ span>
         </h1>
-
-        <p className={`relative max-w-xl text-lg md:text-xl mb-10 leading-relaxed transition-all duration-700 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+        <p className={`relative max-w-xl font-light text-sm md:text-base mb-10 leading-relaxed transition-all duration-700 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ color: '#A0A0A0' }}>
           One subscription payment. Instant USDC distribution to your entire global team
           via Solana. No wire fees. No delays. No borders.
@@ -132,7 +130,7 @@ export default function LandingPage() {
 
         <div className={`relative flex flex-col sm:flex-row items-center gap-4 transition-all duration-700 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
           {/* "Start Paying Your Team" — auth-gated */}
-          <button onClick={handleLaunchApp} className="btn-blaze px-8 py-4 rounded-xl text-base gap-2">
+          <button onClick={handleLaunchApp} className="btn-blaze px-6 py-3 rounded-xl text-sm gap-2">
             Start Paying Your Team <ArrowRight size={18} />
           </button>
           <a href="#how" className="flex items-center gap-2 text-sm transition-colors"
@@ -148,7 +146,7 @@ export default function LandingPage() {
           {STATS.map(({ label, value, sub, icon: Icon }) => (
             <div key={label} className="card p-5 text-center">
               <Icon size={18} className="mx-auto mb-2" style={{ color: '#FF4D00' }} />
-              <div className="font-display text-3xl" style={{ color: '#FF4D00' }}>{value}</div>
+              <div className="font-sans text-xl" style={{ color: '#FF4D00' }}>{value}</div>
               <div className="text-xs mt-1" style={{ color: '#A0A0A0' }}>{label}</div>
               <div className="font-mono-custom text-[10px] mt-0.5" style={{ color: '#555' }}>{sub}</div>
             </div>
@@ -159,8 +157,8 @@ export default function LandingPage() {
       {/* ── How it works ─────────────────────────────────── */}
       <section id="how" className="py-24 px-6 mx-auto" style={{ maxWidth: '1152px' }}>
         <div className="text-center mb-16">
-          <div className="font-mono-custom text-xs tracking-widest mb-4" style={{ color: '#FF4D00' }}>THE FLOW</div>
-          <h2 className="font-display text-5xl md:text-7xl" style={{ color: '#FAFAFA' }}>HOW IT WORKS</h2>
+          <div className="font-mono-custom text-xs tracking-widest mb-4" style={{ color: '#FF4D00' }}>the flow</div>
+          <h2 className="font-display text-3xl md:text-5xl" style={{ color: '#FAFAFA' }}>how it works</h2>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 mb-12">
@@ -171,7 +169,7 @@ export default function LandingPage() {
                 <Icon size={22} style={{ color }} />
               </div>
               <div className="font-mono-custom text-xs mb-2" style={{ color }}>{step}</div>
-              <h3 className="font-semibold text-xl mb-3" style={{ color: '#FAFAFA' }}>{title}</h3>
+              <h3 className="font-semibold text-lg mb-3" style={{ color: '#FAFAFA' }}>{title}</h3>
               <p className="text-sm leading-relaxed" style={{ color: '#A0A0A0' }}>{desc}</p>
             </div>
           ))}
@@ -201,8 +199,9 @@ export default function LandingPage() {
       {/* ── Why Blaze ────────────────────────────────────── */}
       <section id="why" className="py-24 px-6 mx-auto" style={{ maxWidth: '1152px' }}>
         <div className="text-center mb-16">
-          <div className="font-mono-custom text-xs tracking-widest mb-4" style={{ color: '#FF4D00' }}>VALUE PROPOSITION</div>
-          <h2 className="font-display text-5xl md:text-7xl" style={{ color: '#FAFAFA' }}>WHY BLAZE?</h2>
+          <h2 className="font-display text-5xl md:text-7xl" style={{ color: '#FAFAFA' }}>why 
+          <span className="text-gradient italic"> blaze?</span>
+          </h2>
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
@@ -214,7 +213,7 @@ export default function LandingPage() {
               </div>
               <div>
                 <div className="flex items-center gap-3 mb-2 flex-wrap">
-                  <h3 className="font-semibold text-lg" style={{ color: '#FAFAFA' }}>{title}</h3>
+                  <h3 className="font-normal text-sm" style={{ color: '#FAFAFA' }}>{title}</h3>
                   <span className="font-mono-custom text-[10px] px-2 py-0.5 rounded"
                     style={{ background: 'rgba(255,77,0,0.1)', color: '#FF6B1A', border: '1px solid rgba(255,77,0,0.25)' }}>
                     {tag}
@@ -230,7 +229,7 @@ export default function LandingPage() {
       {/* ── Comparison ───────────────────────────────────── */}
       <section className="py-24 px-6 mx-auto" style={{ maxWidth: '1152px' }}>
         <div className="text-center mb-16">
-          <h2 className="font-display text-5xl md:text-6xl" style={{ color: '#FAFAFA' }}>BLAZE VS THE OLD WAY</h2>
+          <h2 className="font-display text-5xl md:text-6xl" style={{ color: '#FAFAFA' }}>blaze vs the old way</h2>
         </div>
         <div className="card overflow-hidden" style={{ border: '1px solid rgba(255,77,0,0.2)' }}>
           <table className="w-full">
@@ -268,14 +267,14 @@ export default function LandingPage() {
       {/* ── Pricing CTA ──────────────────────────────────── */}
       <section id="pricing" className="py-24 px-6 text-center">
         <div className="mx-auto" style={{ maxWidth: '640px' }}>
-          <div className="font-mono-custom text-xs tracking-widest mb-4" style={{ color: '#FF4D00' }}>SIMPLE PRICING</div>
-          <h2 className="font-display text-7xl mb-4" style={{ color: '#FAFAFA' }}>JUST 2.5%</h2>
+
+          <h2 className="font-display text-5xl mb-4" style={{ color: '#FAFAFA' }}>just 2.5%</h2>
           <p className="text-lg mb-10 leading-relaxed" style={{ color: '#A0A0A0' }}>
             No monthly SaaS fee. No per-seat charges. Blaze takes 2.5% of each payroll run —
             the rest goes directly to your team as USDC.
           </p>
           {/* "Start Paying Globally" — auth-gated */}
-          <button onClick={handleLaunchApp} className="btn-blaze px-10 py-5 rounded-xl text-lg gap-3 mx-auto">
+          <button onClick={handleLaunchApp} className="btn-blaze px-7 py-3 rounded-xl text-sm gap-3 mx-auto">
             <Flame size={20} /> Start Paying Globally <ArrowRight size={20} />
           </button>
         </div>
@@ -286,7 +285,7 @@ export default function LandingPage() {
         style={{ borderTop: '1px solid #1a1a1a' }}>
         <div className="flex items-center gap-2">
           <Flame size={18} style={{ color: '#FF4D00' }} />
-          <span className="font-display text-2xl tracking-wider" style={{ color: '#FAFAFA' }}>BLAZE</span>
+          <span className="font-display text-2xl tracking-tight italic" style={{ color: '#FAFAFA' }}>blaze</span>
         </div>
         <p className="font-mono-custom text-xs" style={{ color: '#555' }}>GLOBAL PAYROLL ON SOLANA · POWERED BY DODO PAYMENTS</p>
         <p className="text-xs" style={{ color: '#333' }}>Demo app — not financial advice</p>

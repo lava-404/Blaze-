@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
 @theme {
-  --font-display: 'Bebas Neue', sans-serif;
+  --font-display: 'Playfair Display', serif;
   --font-mono:    'DM Mono', monospace;
-  --font-sans:    'Sora', sans-serif;
+  --font-sans:    'Inter', sans-serif;
 
   --color-blaze-hot:  #FF4D00;
   --color-blaze-mid:  #FF6B1A;
@@ -42,14 +42,21 @@ html { scroll-behavior: smooth; }
 body {
   background: #0a0a0a;
   color: #FAFAFA;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
 }
 
 /* ── Font helpers ──────────────────────────────── */
-.font-display     { font-family: 'Bebas Neue', sans-serif; }
+.font-display     { font-family: 'Playfair Display', serif !important; }
 .font-mono-custom { font-family: 'DM Mono', monospace; }
+.font-sans        { font-family: 'Inter', sans-serif !important; }
+
+/* Make headings reliably use Playfair */
+h1, h2 {
+  font-family: 'Playfair Display', serif;
+  letter-spacing: -0.02em;
+}
 
 /* ── Gradient text ─────────────────────────────── */
 .text-gradient {
@@ -69,17 +76,46 @@ body {
   background-size: 40px 40px;
 }
 
+/* ── Section shell (subtle premium glow) ───────── */
+.section-shell {
+  position: relative;
+}
+.section-shell::before {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background:
+    radial-gradient(800px 350px at 50% 0%, rgba(255,77,0,0.10), transparent 55%),
+    radial-gradient(700px 350px at 10% 30%, rgba(255,140,66,0.06), transparent 60%),
+    radial-gradient(700px 350px at 90% 30%, rgba(255,107,26,0.06), transparent 60%);
+  opacity: 1;
+}
+
 /* ── Card ──────────────────────────────────────── */
 .card {
   background: #111111;
   border: 1px solid #2a2a2a;
   border-radius: 12px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 .card:hover {
   border-color: rgba(255,77,0,0.3);
   box-shadow: 0 4px 20px rgba(255,77,0,0.05);
+  transform: translateY(-1px);
 }
+.card::after {
+  content: '';
+  position: absolute;
+  inset: -1px;
+  pointer-events: none;
+  background: radial-gradient(400px 180px at 20% 0%, rgba(255,77,0,0.10), transparent 60%);
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+.card:hover::after { opacity: 1; }
 
 /* ── Button ────────────────────────────────────── */
 .btn-blaze {
@@ -88,16 +124,27 @@ body {
   justify-content: center;
   background: linear-gradient(135deg, #FF4D00, #FF6B1A);
   color: #fff;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   letter-spacing: 0.02em;
   border: none;
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease, opacity 0.2s ease;
+  position: relative;
+  overflow: hidden;
 }
 .btn-blaze:hover   { transform: translateY(-1px); box-shadow: 0 8px 30px rgba(255,77,0,0.4); }
 .btn-blaze:active  { transform: translateY(0); }
 .btn-blaze:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: none; }
+.btn-blaze::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 20%, rgba(255,255,255,0.22) 45%, transparent 70%);
+  transform: translateX(-120%);
+  transition: transform 0.5s ease;
+}
+.btn-blaze:hover::after { transform: translateX(120%); }
 
 /* ── Input ─────────────────────────────────────── */
 .input-blaze {
@@ -106,7 +153,7 @@ body {
   color: #FAFAFA;
   border-radius: 8px;
   padding: 12px 16px;
-  font-family: 'Sora', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   transition: border-color 0.2s ease, box-shadow 0.2s ease;
   width: 100%;
