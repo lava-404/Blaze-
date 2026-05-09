@@ -32,6 +32,9 @@ importers:
       bs58:
         specifier: ^6.0.0
         version: 6.0.0
+      dodopayments:
+        specifier: ^2.31.1
+        version: 2.31.1
       framer-motion:
         specifier: ^12.38.0
         version: 12.38.0(@emotion/is-prop-valid@1.4.0)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
@@ -2080,6 +2083,10 @@ packages:
 
   dijkstrajs@1.0.3:
     resolution: {integrity: sha512-qiSlmBq9+BCdCA/L46dw8Uy93mloxsPSbwnm5yrKn2vMPiy8KyAskTF6zuV/j5BMsmOGZDPs7KjU+mjb670kfA==}
+
+  dodopayments@2.31.1:
+    resolution: {integrity: sha512-dtYplxE4HZzlXoINDxdMNMYMq5BHUbecPijT4yKeO2KEJuiwrMbzzDRsngi1Bk2oTFn1GVayS7Ty89xbtf1y/w==}
+    hasBin: true
 
   dotenv@16.6.1:
     resolution: {integrity: sha512-uBq4egWHTcTt33a72vpSG0z3HnPuIl6NqYcTrKEg2azoEyl2hpW0zqlxysq2pK9HlDIHyHyakeYaYnSAwd8bow==}
@@ -7387,6 +7394,10 @@ snapshots:
   detect-libc@2.1.2: {}
 
   dijkstrajs@1.0.3: {}
+
+  dodopayments@2.31.1:
+    dependencies:
+      standardwebhooks: 1.0.0
 
   dotenv@16.6.1: {}
 
