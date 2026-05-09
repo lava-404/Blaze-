@@ -72,6 +72,8 @@ function getPrivyDisplayName(user: any): string {
 export default function Dashboard() {
   const router = useRouter();
   const { authenticated, user } = usePrivy();
+  const { getAccessToken } = usePrivy();
+  
   const founderEmail = getPrivyEmail(user);
   const founderName = getPrivyDisplayName(user);
 
@@ -103,13 +105,16 @@ export default function Dashboard() {
     if (!payAmount || parseFloat(payAmount) <= 0) return;
     if (!founderEmail) return;
     setPaying(true);
+    const accessToken = await getAccessToken();
     try {
       const res = await fetch('/api/payments/create', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Authorization': `Bearer ${accessToken}`,
+    'Content-Type': 'application/json', },
         body: JSON.stringify({ founderEmail, founderName, amountUSD: parseFloat(payAmount) }),
       });
       const data = await res.json();
+      console.log(data);
       if (!res.ok) {
         if (data?.code === 'TEAM_REQUIRED') {
           router.push('/onboarding?reason=team_required');

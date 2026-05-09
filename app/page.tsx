@@ -27,7 +27,7 @@ const STEPS = [
   {
     step: '03',
     title: 'Single-Tx Distribution',
-    desc: 'All team members receive USDC in one atomic Solana transaction. ~$0.001 total fee.',
+    desc: 'All team members receive USDC in one atomic Solana transaction.',
     icon: Globe,
     color: '#FF8C42',
   },
@@ -49,7 +49,7 @@ const FLOW_NODES = [
 ];
 
 const FEATURES = [
-  { Icon: Zap,        title: 'Lightning Fast',             desc: 'Solana processes transactions in under 400 ms. Your team gets paid before you finish your coffee.',                    tag: '~400 ms finality' },
+  { Icon: Zap,        title: 'Automated',             desc: 'Solana processes transactions in under 400 ms. Your team gets paid before you finish your coffee.',                    tag: '~400 ms finality' },
   { Icon: Globe,      title: 'Truly Global',               desc: 'Any developer, designer, or contractor with a Solana wallet can receive USDC — regardless of location.',             tag: '195+ countries' },
   { Icon: ShieldCheck,title: 'Battle-Tested Rails',        desc: 'Dodo Payments handles compliant fiat collection. Solana handles immutable, transparent disbursement.',               tag: 'Fully auditable' },
   { Icon: Clock,      title: 'One Subscription = All Paid',desc: 'No more 5 separate wire transfers. One Dodo checkout, one Solana tx, everyone paid instantly.',                     tag: '$0.001 total gas' },
@@ -124,8 +124,7 @@ export default function LandingPage() {
         </h1>
         <p className={`relative max-w-xl font-light text-sm md:text-base mb-10 leading-relaxed transition-all duration-700 delay-200 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
           style={{ color: '#A0A0A0' }}>
-          One subscription payment. Instant USDC distribution to your entire global team
-          via Solana. No wire fees. No delays. No borders.
+          Schedule, automate, and distribute global team payroll using stablecoins.
         </p>
 
         <div className={`relative flex flex-col sm:flex-row items-center gap-4 transition-all duration-700 delay-300 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>

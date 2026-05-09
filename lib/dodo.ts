@@ -1,6 +1,8 @@
 // Dodo Payments integration
 // https://docs.dodopayments.com
 
+import DodoPayments from 'dodopayments';
+
 export interface DodoCheckoutSession {
   id: string;
   url: string;
@@ -22,7 +24,7 @@ export interface DodoWebhookEvent {
   };
 }
 
-const DODO_BASE_URL = 'https://api.dodopayments.com/v1';
+
 const PLATFORM_FEE_PERCENT = 2.5; // Blaze takes 2.5% fee
 
 /**
@@ -49,6 +51,7 @@ export async function createDodoCheckout({
   const apiKey = process.env.DODO_PAYMENTS_API_KEY;
 
   if (!apiKey || apiKey === 'your_dodo_api_key') {
+    console.log(apiKey)
     // Demo mode: return a simulated checkout session
     return {
       id: `dodo_demo_${Date.now()}`,
@@ -59,46 +62,48 @@ export async function createDodoCheckout({
       metadata: { founderId, paymentId },
     };
   }
+  console.log(apiKey)
+  const client = new DodoPayments({ bearerToken: apiKey, environment: 'test_mode',});
 
-  const response = await fetch(`${DODO_BASE_URL}/checkout/sessions`, {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${apiKey}`,
-      'Content-Type': 'application/json',
+  const product = await client.products.create({
+    name: 'Blaze',
+    price: {
+      currency: 'USD', 
+      discount: 0,
+      price: amountUSD,
+      purchasing_power_parity: true,
+      type: 'one_time_price',
     },
-    body: JSON.stringify({
-      amount: Math.round(amountUSD * 100), // Convert to cents
-      currency: 'USD',
-      payment_methods: ['card', 'bank_transfer', 'ach'],
-      customer: {
-        email: founderEmail,
-        name: founderName,
-      },
-      metadata: {
-        founderId,
-        paymentId,
-      },
-      success_url: successUrl,
-      cancel_url: cancelUrl,
-      line_items: [
-        {
-          name: 'Blaze Platform - Team Payroll',
-          description: `Global USDC payroll distribution for your team`,
-          amount: Math.round(amountUSD * 100),
-          currency: 'USD',
-          quantity: 1,
-        },
-      ],
-    }),
+    tax_category: 'saas',
   });
+  console.log("creating a product id")
+  console.log(product.product_id)
 
-  if (!response.ok) {
-    const error = await response.json();
-    throw new Error(`Dodo Payments error: ${JSON.stringify(error)}`);
-  }
+  const PRODUCT_ID = product.product_id;
 
-  const data = await response.json();
-  return data;
+  const checkoutSessionResponse = await client.checkoutSessions.create({
+    product_cart: [{ product_id: PRODUCT_ID, quantity: 1 }],
+    customer: {
+      email: founderEmail,
+      name: founderName,
+    },
+    metadata: {
+      founderId,
+      paymentId,
+    },
+    cancel_url: cancelUrl,
+    return_url: 'http://localhost:3000/dashboard'
+  });
+  console.log(checkoutSessionResponse);
+
+  return {
+    id: checkoutSessionResponse.session_id,
+    url: checkoutSessionResponse.checkout_url ?? '',
+    status: 'open',
+    amount: amountUSD * 100, // cents
+    currency: 'USD',
+    metadata: { founderId, paymentId },
+  };
 }
 
 /**
@@ -118,12 +123,26 @@ export async function getDodoPayment(dodoPaymentId: string): Promise<DodoCheckou
     };
   }
 
-  const response = await fetch(`${DODO_BASE_URL}/checkout/sessions/${dodoPaymentId}`, {
-    headers: { 'Authorization': `Bearer ${apiKey}` },
-  });
+  try {
+    const client = new DodoPayments({ bearerToken: apiKey });
 
-  if (!response.ok) return null;
-  return response.json();
+    const checkoutSessionStatus = await client.checkoutSessions.retrieve(dodoPaymentId);
+
+    return {
+      id: checkoutSessionStatus.id,
+      url: '',
+      status: checkoutSessionStatus.payment_status ?? 'pending',
+      amount: 0, // not returned by retrieve endpoint
+      currency: 'USD',
+      metadata: {
+        customer_email: checkoutSessionStatus.customer_email ?? '',
+        customer_name: checkoutSessionStatus.customer_name ?? '',
+        payment_id: checkoutSessionStatus.payment_id ?? '',
+      },
+    };
+  } catch {
+    return null;
+  }
 }
 
 /**
